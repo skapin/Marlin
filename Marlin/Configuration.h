@@ -32,7 +32,7 @@
 // Sanguinololu 1.2 and above = 62
 // Ultimaker = 7,
 // Teensylu = 8
-#define MOTHERBOARD 7
+#define MOTHERBOARD 33
 
 //===========================================================================
 //=============================Thermal Settings  ============================
@@ -46,17 +46,17 @@
 // 5 is ParCan supplied 104GT-2 100K
 // 6 is EPCOS 100k
 // 7 is 100k Honeywell thermistor 135-104LAG-J01
-//#define THERMISTORHEATER_0 3
-//#define THERMISTORHEATER_1 3
-//#define THERMISTORBED 3
+#define THERMISTORHEATER_0 1
+//#define THERMISTORHEATER_1 1
+#define THERMISTORBED 1
 
-//#define HEATER_0_USES_THERMISTOR
+#define HEATER_0_USES_THERMISTOR
 //#define HEATER_1_USES_THERMISTOR
-#define HEATER_0_USES_AD595
+//#define HEATER_0_USES_AD595
 //#define HEATER_1_USES_AD595
 
 // Select one of these only to define how the bed temp is read.
-//#define BED_USES_THERMISTOR
+#define BED_USES_THERMISTOR
 //#define BED_USES_AD595
 
 #define BED_CHECK_INTERVAL 5000 //ms
@@ -165,9 +165,9 @@
 // Endstop Settings
 #define ENDSTOPPULLUPS // Comment this out (using // at the start of the line) to disable the endstop pullup resistors
 // The pullups are needed if you directly connect a mechanical endswitch between the signal and ground pins.
-const bool X_ENDSTOPS_INVERTING = true; // set to true to invert the logic of the endstops. 
-const bool Y_ENDSTOPS_INVERTING = true; // set to true to invert the logic of the endstops. 
-const bool Z_ENDSTOPS_INVERTING = true; // set to true to invert the logic of the endstops. 
+const bool X_ENDSTOPS_INVERTING = false; // set to true to invert the logic of the endstops. 
+const bool Y_ENDSTOPS_INVERTING = false; // set to true to invert the logic of the endstops. 
+const bool Z_ENDSTOPS_INVERTING = false; // set to true to invert the logic of the endstops. 
 // For optos H21LOB set to true, for Mendel-Parts newer optos TCST2103 set to false
 
 
@@ -189,10 +189,10 @@ const bool Z_ENDSTOPS_INVERTING = true; // set to true to invert the logic of th
 //#define INVERT_Z_DIR false    // for Mendel set to false, for Orca set to true
 //#define INVERT_E_DIR true   // for direct drive extruder v9 set to true, for geared extruder set to false
 
-#define INVERT_X_DIR true     // for Mendel set to false, for Orca set to true
-#define INVERT_Y_DIR false    // for Mendel set to true, for Orca set to false
-#define INVERT_Z_DIR true     // for Mendel set to false, for Orca set to true
-#define INVERT_E_DIR false    // for direct drive extruder v9 set to true, for geared extruder set to false
+#define INVERT_X_DIR false     // for Mendel set to false, for Orca set to true
+#define INVERT_Y_DIR true    // for Mendel set to true, for Orca set to false
+#define INVERT_Z_DIR false     // for Mendel set to false, for Orca set to true
+#define INVERT_E_DIR true    // for direct drive extruder v9 set to true, for geared extruder set to false
 
 //// ENDSTOP SETTINGS:
 // Sets direction of endstops when homing; 1=MAX, -1=MIN
@@ -201,14 +201,15 @@ const bool Z_ENDSTOPS_INVERTING = true; // set to true to invert the logic of th
 #define Z_HOME_DIR -1
 
 #define min_software_endstops false //If true, axis won't move to coordinates less than zero.
-#define max_software_endstops false  //If true, axis won't move to coordinates greater than the defined lengths below.
-#define X_MAX_LENGTH 210
-#define Y_MAX_LENGTH 210
-#define Z_MAX_LENGTH 210
+#define max_software_endstops true  //If true, axis won't move to coordinates greater than the defined lengths below.
+#define X_MAX_LENGTH 180
+#define Y_MAX_LENGTH 191
+#define Z_MAX_LENGTH 140
 
 //// MOVEMENT SETTINGS
 #define NUM_AXIS 4 // The axis order in all axis related arrays is X, Y, Z, E
-#define HOMING_FEEDRATE {50*60, 50*60, 4*60, 0}  // set the homing speeds (mm/min)
+//#define HOMING_FEEDRATE {50*60, 50*60, 4*60, 0}  // set the homing speeds (mm/min)
+#define HOMING_FEEDRATE {1500, 1500, 300, 0}  // set the homing speeds (mm/min)
 
 //homing hits the endstop, then retracts by this distance, before it tries to slowly bump again:
 #define X_HOME_RETRACT_MM 5 
@@ -221,10 +222,27 @@ const bool Z_ENDSTOPS_INVERTING = true; // set to true to invert the logic of th
 
 // default settings 
 
-#define DEFAULT_AXIS_STEPS_PER_UNIT   {78.7402,78.7402,200*8/3,760*1.1}                    // default steps per unit for ultimaker 
+//// Calibration variables
+// X, Y, Z, E steps per unit - Metric Prusa Mendel with Hinged Greg's Wade extruder:
+// SloateBot:
+// X and Y axes are 19.25 mm pitch diameter, SDP-SI.com #A6M35M012DF1005, which gives us
+//    C=19.25pi mm per rev. At 1/2 stepping that is 400 steps per rev. so then we have 400/(19.25pi) = 6.614231401221625 stepspermm
+//    At 1/4 stepping that is 800 steps per rev. so then we have 800/(19.25pi) = 13.22846280244325 stepspermm
+//    At 1/16th stepping that is 3200/(19.25pi) = 52.913851209772999 stepspermm.
+// Z-axis: 1.8 degree is 200 steps per revolution, 1 revolution is 1.25 mm (z-rod pitch), at 1/16th stepping
+//    we have 3200 steps/1.25 mm to give 2560 stepspermm
+// E-axis: 7.25 mm is diameter of hobbed bolt, so C = 7.25pi per rev. At 1/16th stepping this is: 800/(7.25pi), but we have
+//    hinged wade extruder, so this is converted 43/10 ratio. I think these are all wrong anyway... just do 4x the quarter stepping
+//    we had before
+//    UGH -- GO BACK TO 1/4 STEPPING FOR EXTRUDER. LOSING STEPS at 1/16th stepping
+
+#define DEFAULT_AXIS_STEPS_PER_UNIT   {52.913851209772999, 52.913851209772999, 2560, 124.530011898862}                    
+
+// #define DEFAULT_AXIS_STEPS_PER_UNIT   {78.7402,78.7402,200*8/3,760*1.1}                    // default steps per unit for ultimaker 
 //#define DEFAULT_AXIS_STEPS_PER_UNIT   {40, 40, 3333.92, 67} //sells mendel with v9 extruder
 #define DEFAULT_MAX_FEEDRATE          {500, 500, 5, 200000}    // (mm/sec)    
-#define DEFAULT_MAX_ACCELERATION      {9000,9000,100,10000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
+#define DEFAULT_MAX_ACCELERATION      {500,500,50,500}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
+// #define DEFAULT_MAX_ACCELERATION      {9000,9000,100,10000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
 
 #define DEFAULT_ACCELERATION          3000    // X, Y, Z and E max acceleration in mm/s^2 for printing moves 
 #define DEFAULT_RETRACT_ACCELERATION  7000   // X, Y, Z and E max acceleration in mm/s^2 for r retracts
