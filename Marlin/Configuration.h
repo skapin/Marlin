@@ -235,8 +235,11 @@ const bool Z_ENDSTOPS_INVERTING = false; // set to true to invert the logic of t
 //    hinged wade extruder, so this is converted 43/10 ratio. I think these are all wrong anyway... just do 4x the quarter stepping
 //    we had before
 //    UGH -- GO BACK TO 1/4 STEPPING FOR EXTRUDER. LOSING STEPS at 1/16th stepping
+// Jordan Miller -- SloateBot axis steps per unit:
+// #define DEFAULT_AXIS_STEPS_PER_UNIT   {52.913851209772999, 52.913851209772999, 2560, 124.530011898862}                    
 
-#define DEFAULT_AXIS_STEPS_PER_UNIT   {52.913851209772999, 52.913851209772999, 2560, 124.530011898862}                    
+// ASSUME 1/16th stepping on ALL axes for Prusa Standard Config
+#define DEFAULT_AXIS_STEPS_PER_UNIT   {80, 80, 3200/1.25,700}
 
 // #define DEFAULT_AXIS_STEPS_PER_UNIT   {78.7402,78.7402,200*8/3,760*1.1}                    // default steps per unit for ultimaker 
 //#define DEFAULT_AXIS_STEPS_PER_UNIT   {40, 40, 3333.92, 67} //sells mendel with v9 extruder
