@@ -302,6 +302,18 @@
 #endif
 
 /****************************************************************************************
+* Air Control 
+* Control Ambiant Air. Only for RAMPS (24) for now
+****************************************************************************************/ 
+#if AIR_CONTROL == 1
+
+ #if MOTHERBOARD == 34
+  #define HEATER_AIR_0_PIN	-1  // AIR 0
+  #define HEATER_AIR_1_PIN	-1	// AIR 1
+  #define TEMP_AIR_PIN		-1	// ANALOG NUMBERING
+ #endif
+#endif
+/****************************************************************************************
 * Arduino Mega pin assignment
 *
 ****************************************************************************************/
@@ -316,7 +328,7 @@
 #endif
 
 // uncomment one of the following lines for RAMPS v1.3 or v1.0, comment both for v1.2 or 1.1
-// #define RAMPS_V_1_3
+#define RAMPS_V_1_3
 // #define RAMPS_V_1_0
 
 #if MOTHERBOARD == 33 || MOTHERBOARD == 34

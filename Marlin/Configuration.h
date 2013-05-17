@@ -17,8 +17,8 @@
 #define SERIAL_PORT 0
 
 // This determines the communication speed of the printer
-#define BAUDRATE 250000
-//#define BAUDRATE 115200
+//#define BAUDRATE 250000
+#define BAUDRATE 115200
 
 //// The following define selects which electronics board you have. Please choose the one that matches your setup
 // 10 = Gen7 custom (Alfons3 Version) "https://github.com/Alfons3/Generation_7_Electronics"
@@ -48,8 +48,10 @@
 // 301 = Rambo
 
 #ifndef MOTHERBOARD
-#define MOTHERBOARD 7
+#define MOTHERBOARD 34
 #endif
+
+#define AIR_CONTROL 1	// Control of ambiante air 1 for control, 0 for no control
 
 //// The following define selects which power supply you have. Please choose the one that matches your setup
 // 1 = ATX
@@ -84,14 +86,15 @@
 // 52 is 200k thermistor - ATC Semitec 204GT-2 (1k pullup)
 // 55 is 100k thermistor - ATC Semitec 104GT-2 (Used in ParCan) (1k pullup)
 
-#define TEMP_SENSOR_0 -1
+#define TEMP_SENSOR_0 1
 #define TEMP_SENSOR_1 0
 #define TEMP_SENSOR_2 0
-#define TEMP_SENSOR_BED 0
+#define TEMP_SENSOR_BED 1
+#define TEMP_SENSOR_AIR 1
 
 // Actual temperature must be close to target for this long before M109 returns success
 #define TEMP_RESIDENCY_TIME 10	// (seconds)
-#define TEMP_HYSTERESIS 3       // (degC) range of +/- temperatures considered "close" to the target one
+#define TEMP_HYSTERESIS 5       // (degC) range of +/- temperatures considered "close" to the target one
 #define TEMP_WINDOW     1       // (degC) Window around target to start the recidency timer x degC early.
 
 // The minimal temperature defines the temperature below which the heater will not be enabled It is used
@@ -101,6 +104,7 @@
 #define HEATER_1_MINTEMP 5
 #define HEATER_2_MINTEMP 5
 #define BED_MINTEMP 5
+#define AIR_MINTEMP 5
 
 // When temperature exceeds max temp, your heater will be switched off.
 // This feature exists to protect your hotend from overheating accidentally, but *NOT* from thermistor short/failure!
@@ -109,6 +113,12 @@
 #define HEATER_1_MAXTEMP 275
 #define HEATER_2_MAXTEMP 275
 #define BED_MAXTEMP 150
+#define AIR_MAXTEMP 150
+
+// Air control Define
+#define AIR_TEMP_RESIDENCY_TIME 5	// (seconds) waiting time for "okay"
+#define AIR_TEMP_HYSTERESIS 7       // (degC) range of +/- temperatures considered "close" to the target one
+#define AIR_TEMP_WINDOW     1       // (degC) Window around target to start the recidency timer x degC early
 
 // If your bed has low resistance e.g. .6 ohm and throws the fuse you can duty cycle it to reduce the
 // average current. The value should be an integer and the heat bed will be turned on for 1 interval of
@@ -156,7 +166,7 @@
 // If your configuration is significantly different than this and you don't understand the issues involved, you proabaly 
 // shouldn't use bed PID until someone else verifies your hardware works.
 // If this is enabled, find your own PID constants below.
-//#define PIDTEMPBED
+#define PIDTEMPBED
 //
 //#define BED_LIMIT_SWITCHING
 
@@ -181,6 +191,28 @@
 
 // FIND YOUR OWN: "M303 E-1 C8 S90" to run autotune on the bed at 90 degreesC for 8 cycles.
 #endif // PIDTEMPBED
+
+
+#if AIR_CONTROL == 1
+ #define PIDTEMPAIR
+#define MAX_AIR_POWER 256 // limits duty cycle to air; 256=full current
+
+ #ifdef PIDTEMPAIR
+//120v 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
+//from FOPDT model - kp=.39 Tp=405 Tdead=66, Tc set to 79.2, argressive factor of .15 (vs .1, 1, 10)
+    #define  DEFAULT_airKp 10.00
+    #define  DEFAULT_airKi .023
+    #define  DEFAULT_airKd 305.4
+
+//120v 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
+//from pidautotune
+//    #define  DEFAULT_airKp 97.1
+//    #define  DEFAULT_airKi 1.41
+//    #define  DEFAULT_airKd 1675.16
+
+#endif // PIDTEMPAIR
+
+#endif
 
 
 

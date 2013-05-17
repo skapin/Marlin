@@ -325,6 +325,11 @@ const unsigned int dropsegments=5; //everything with less than this number of st
   #define THERMISTORBED TEMP_SENSOR_BED
   #define BED_USES_THERMISTOR
 #endif
+#if TEMP_SENSOR_AIR > 0
+  #define THERMISTORAIR TEMP_SENSOR_AIR
+  #define AIR_USES_THERMISTOR	// to delete imo
+#endif
+
 #if TEMP_SENSOR_0 == -1
   #define HEATER_0_USES_AD595
 #endif
@@ -356,6 +361,9 @@ const unsigned int dropsegments=5; //everything with less than this number of st
   #undef BED_MINTEMP
   #undef BED_MAXTEMP
 #endif
-
+#if TEMP_SENSOR_AIR == 0
+  #undef AIR_MINTEMP
+  #undef AIR_MAXTEMP
+#endif
 
 #endif //__CONFIGURATION_ADV_H
