@@ -40,9 +40,6 @@
 #include "language.h"
 #include "pins_arduino.h"
 
-#include "AirControl.h"
-
-
 #if DIGIPOTSS_PIN > -1
 #include <SPI.h>
 #endif
@@ -437,8 +434,6 @@ void loop()
   }
   //check heater every n milliseconds
   manage_heater();
-  //check air temp every m milliseconds
-  manage_air();
   manage_inactivity();
   checkHitEndstops();
   lcd_update();
@@ -1988,6 +1983,7 @@ void prepare_move()
     current_position[i] = destination[i];
   }
 }
+
 
 void prepare_arc_move(char isclockwise) {
   float r = hypot(offset[X_AXIS], offset[Y_AXIS]); // Compute arc radius for mc_arc

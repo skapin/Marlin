@@ -51,8 +51,6 @@
 #define MOTHERBOARD 34
 #endif
 
-#define AIR_CONTROL 1	// Control of ambiante air 1 for control, 0 for no control
-
 //// The following define selects which power supply you have. Please choose the one that matches your setup
 // 1 = ATX
 // 2 = X-Box 360 203Watts (the blue wire connected to PS_ON and the red wire to VCC)
@@ -193,9 +191,9 @@
 #endif // PIDTEMPBED
 
 
-#if AIR_CONTROL == 1
+#if TEMP_SENSOR_AIR != 0
  #define PIDTEMPAIR
-#define MAX_AIR_POWER 256 // limits duty cycle to air; 256=full current
+ #define MAX_AIR_POWER 256 // limits duty cycle to air; 256=full current
 
  #ifdef PIDTEMPAIR
 //120v 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
@@ -204,14 +202,7 @@
     #define  DEFAULT_airKi .023
     #define  DEFAULT_airKd 305.4
 
-//120v 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
-//from pidautotune
-//    #define  DEFAULT_airKp 97.1
-//    #define  DEFAULT_airKi 1.41
-//    #define  DEFAULT_airKd 1675.16
-
-#endif // PIDTEMPAIR
-
+ #endif // PIDTEMPAIR
 #endif
 
 

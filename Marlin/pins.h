@@ -53,6 +53,21 @@
 
 #endif /* 99 */
 
+
+/****************************************************************************************
+* Air Control 
+* Control Ambiant Air. Only for RAMPS (24) for now
+****************************************************************************************/ 
+#if AIR_CONTROL == 1
+
+ #if MOTHERBOARD == 34
+  #define HEATER_AIR_0_PIN	-1  // AIR 0
+  #define HEATER_AIR_1_PIN	-1	// AIR 1
+  #define TEMP_AIR_PIN		-1	// ANALOG NUMBERING
+ #endif
+#endif
+
+
 /****************************************************************************************
 * Gen7 v1.1, v1.2, v1.3 pin assignment
 *
@@ -301,18 +316,6 @@
     #define encrot3 1
 #endif
 
-/****************************************************************************************
-* Air Control 
-* Control Ambiant Air. Only for RAMPS (24) for now
-****************************************************************************************/ 
-#if AIR_CONTROL == 1
-
- #if MOTHERBOARD == 34
-  #define HEATER_AIR_0_PIN	-1  // AIR 0
-  #define HEATER_AIR_1_PIN	-1	// AIR 1
-  #define TEMP_AIR_PIN		-1	// ANALOG NUMBERING
- #endif
-#endif
 /****************************************************************************************
 * Arduino Mega pin assignment
 *
