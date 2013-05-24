@@ -118,6 +118,9 @@
 #define AIR_TEMP_HYSTERESIS 7       // (degC) range of +/- temperatures considered "close" to the target one
 #define AIR_TEMP_WINDOW     1       // (degC) Window around target to start the recidency timer x degC early
 
+//Fan control
+#define FAN_TEMP_ACTIVE 35
+
 // If your bed has low resistance e.g. .6 ohm and throws the fuse you can duty cycle it to reduce the
 // average current. The value should be an integer and the heat bed will be turned on for 1 interval of
 // HEATER_BED_DUTY_CYCLE_DIVIDER intervals.

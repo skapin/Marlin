@@ -41,6 +41,7 @@
 #include "pins_arduino.h"
 
 #include "AirControl.h"
+#include "FanControl.h"
 
 
 #if DIGIPOTSS_PIN > -1
@@ -378,6 +379,8 @@ void setup()
   Config_RetrieveSettings(); 
 
   tp_init();    // Initialize temperature loop 
+  air_init();
+  fan_init();
   plan_init();  // Initialize planner;
   watchdog_init();
   st_init();    // Initialize stepper, this enables interrupts!
@@ -440,6 +443,8 @@ void loop()
   //check air temp every m milliseconds
   manage_air();
   manage_inactivity();
+  // control all fan (FAN_CONTROL_EXTENSION)
+  control_fan( );
   checkHitEndstops();
   lcd_update();
 }

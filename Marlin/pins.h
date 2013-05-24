@@ -56,18 +56,27 @@
 
 /****************************************************************************************
 * Air Control 
-* Control Ambiant Air. Only for RAMPS (24) for now
+* Control Ambiant Air. Only for RAMPS (34) for now
 ****************************************************************************************/ 
-#if AIR_CONTROL == 1
-
- #if MOTHERBOARD == 34
-  #define HEATER_AIR_0_PIN	-1  // AIR 0
-  #define HEATER_AIR_1_PIN	-1	// AIR 1
-  #define TEMP_AIR_PIN		-1	// ANALOG NUMBERING
- #endif
+#if MOTHERBOARD == 34
+  #define HEATER_AIR_0_PIN	-1//42  // AIR 0
+  #define HEATER_AIR_1_PIN	-1//44	// AIR 1
+  #define TEMP_AIR_PIN		-1//63	// ANALOG NUMBERING
 #endif
 
-
+/****************************************************************************************
+* FAN Control 
+* Advanced FAN. Only for RAMPS (34) for now
+****************************************************************************************/ 
+#if MOTHERBOARD == 34
+  #define FAN_0_E0_PIN		16  // AIR 0
+  #define FAN_1_E0_PIN		17	// AIR 1
+  #define FAN_MOTOR_E0_PIN	23	// 
+  
+  #define FAN_0_E1_PIN		25  // AIR 0
+  #define FAN_1_E1_PIN		27	// AIR 1
+  #define FAN_MOTOR_E1_PIN	29	// 
+#endif
 /****************************************************************************************
 * Gen7 v1.1, v1.2, v1.3 pin assignment
 *

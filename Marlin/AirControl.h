@@ -32,6 +32,7 @@ FORCE_INLINE bool isCoolingAir() {
   return target_temperature_air < current_temperature_air;
 };
 
+void air_init();
 void updatePID_air();
 int getHeaterAirPower( );
 
