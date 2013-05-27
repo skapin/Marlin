@@ -42,7 +42,6 @@ unsigned long LAST_CHECK_E1 = 0;
  } 
 void control_fan() { //Check if fans should be turned on or off
 	//We have an extruder active, setup fans
-	//if (active_extruder == 0 )
 	if ( EXTRUDERS > 1 ) {
 		CHECK_FAN(1)
 	}
