@@ -59,9 +59,13 @@
 * Control Ambiant Air. Only for RAMPS (34) for now
 ****************************************************************************************/ 
 #if MOTHERBOARD == 34
-  #define HEATER_AIR_0_PIN	-1//42  // AIR 0
-  #define HEATER_AIR_1_PIN	-1//44	// AIR 1
-  #define TEMP_AIR_PIN		-1//63	// ANALOG NUMBERING
+  #define TEMP_AIR_NUMBER	1	// number of air thermistance
+  #define HEATER_AIR_NUMBER	1	// number of air heater
+  #define HEATER_AIR_0_PIN	42
+  #define HEATER_AIR_1_PIN	-1//44
+  #define TEMP_AIR_0_PIN	15	// ANALOG NUMBERING ->  need IC-pull up
+  #define TEMP_AIR_1_PIN	-1	// ANALOG NUMBERING ->  need IC-pull up
+  #define TEMP_AIR_2_PIN	-1	// ANALOG NUMBERING ->  need IC-pull up
 #endif
 
 /****************************************************************************************
@@ -69,12 +73,12 @@
 * Advanced FAN. Only for RAMPS (34) for now
 ****************************************************************************************/ 
 #if MOTHERBOARD == 34
-  #define FAN_0_E0_PIN		16  // AIR 0
-  #define FAN_1_E0_PIN		17	// AIR 1
+  #define FAN_0_E0_PIN		16  // FAN
+  #define FAN_1_E0_PIN		17	// FAN
   #define FAN_MOTOR_E0_PIN	23	// 
   
-  #define FAN_0_E1_PIN		25  // AIR 0
-  #define FAN_1_E1_PIN		27	// AIR 1
+  #define FAN_0_E1_PIN		25  // FAN
+  #define FAN_1_E1_PIN		27	// FAN
   #define FAN_MOTOR_E1_PIN	29	// 
 #endif
 /****************************************************************************************
@@ -402,10 +406,10 @@
 #endif
 #define HEATER_2_PIN       -1   
 #define TEMP_0_PIN         13   // ANALOG NUMBERING
-#define TEMP_1_PIN         15   // ANALOG NUMBERING
+#define TEMP_1_PIN         -1//15   // ANALOG NUMBERING
 #define TEMP_2_PIN         -1   // ANALOG NUMBERING
 #define HEATER_BED_PIN     8    // BED
-#define TEMP_BED_PIN       14   // ANALOG NUMBERING
+#define TEMP_BED_PIN       14//14   // ANALOG NUMBERING
 
 #ifdef ULTRA_LCD
 
@@ -1423,7 +1427,7 @@
 
 #define E1_STEP_PIN         -1 // 21
 #define E1_DIR_PIN          -1 // 20
-#define E1_ENABLE_PIN       -1 // 19
+#define E1_ENABLE_PIN       -1 TEMP_BED_PIN// 19
 
 #define E2_STEP_PIN         -1 // 21
 #define E2_DIR_PIN          -1 // 20

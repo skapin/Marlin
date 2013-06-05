@@ -30,11 +30,14 @@
 // public functions
 void tp_init();  //initialise the heating
 void manage_heater(); //it is critical that this is called periodically.
+bool getTempAirReady();
 
 // low level conversion routines
 // do not use these routines and variables outside of temperature.cpp
 extern int target_temperature[EXTRUDERS];  
 extern float current_temperature[EXTRUDERS];
+
+extern int current_temperature_air_raw[TEMP_AIR_NUMBER];
 extern int target_temperature_bed;
 extern float current_temperature_bed;
 
@@ -93,6 +96,11 @@ FORCE_INLINE bool isCoolingHotend(uint8_t extruder) {
 FORCE_INLINE bool isCoolingBed() {
   return target_temperature_bed < current_temperature_bed;
 };
+
+FORCE_INLINE int getRawTempAir(int captor) {
+	return current_temperature_air_raw[captor];
+}
+
 
 #define degHotend0() degHotend(0)
 #define degTargetHotend0() degTargetHotend(0)

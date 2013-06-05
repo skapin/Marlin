@@ -33,6 +33,7 @@
 #include "ultralcd.h"
 #include "temperature.h"
 #include "watchdog.h"
+#include "AirControl.h"
 
 //===========================================================================
 //=============================public variables============================
@@ -41,9 +42,16 @@ int target_temperature[EXTRUDERS] = { 0 };
 int target_temperature_bed = 0;
 int current_temperature_raw[EXTRUDERS] = { 0 };
 float current_temperature[EXTRUDERS] = { 0 };
+#if TEMP_AIR_NUMBER > 0
+	int current_temperature_air_raw[TEMP_AIR_NUMBER]= { 0 };
+#endif
 int current_temperature_bed_raw = 0;
 float current_temperature_bed = 0;
+volatile bool temp_air_ready = false;
 
+bool getTempAirReady() {
+	return temp_air_ready;
+}
 #ifdef PIDTEMP
   float Kp=DEFAULT_Kp;
   float Ki=(DEFAULT_Ki*PID_dT);
@@ -306,6 +314,7 @@ int getHeaterPower(int heater) {
   return soft_pwm[heater];
 }
 
+
 void manage_heater()
 {
   float pid_input;
@@ -315,7 +324,9 @@ void manage_heater()
     return; 
 
   updateTemperaturesFromRawValues();
-
+  //check air temp every m milliseconds
+  manage_air();
+	
   for(int e = 0; e < EXTRUDERS; e++) 
   {
 
@@ -768,6 +779,7 @@ void setWatch()
 
 void disable_heater()
 {
+	disable_air();
   for(int i=0;i<EXTRUDERS;i++)
     setTargetHotend(0,i);
   setTargetBed(0);
@@ -802,7 +814,7 @@ void disable_heater()
       WRITE(HEATER_BED_PIN,LOW);
     #endif
   #endif 
-}
+ }
 
 void max_temp_error(uint8_t e) {
   disable_heater();
@@ -909,6 +921,11 @@ ISR(TIMER0_COMPB_vect)
   static unsigned long raw_temp_0_value = 0;
   static unsigned long raw_temp_1_value = 0;
   static unsigned long raw_temp_2_value = 0;
+  
+  static unsigned long raw_temp_air_0_value = 0;
+  static unsigned long raw_temp_air_1_value = 0;
+  static unsigned long raw_temp_air_2_value = 0;
+  
   static unsigned long raw_temp_bed_value = 0;
   static unsigned char temp_state = 0;
   static unsigned char pwm_count = 1;
@@ -922,6 +939,15 @@ ISR(TIMER0_COMPB_vect)
   #if HEATER_BED_PIN > -1
   static unsigned char soft_pwm_b;
   #endif
+  
+  #if TEMP_AIR_NUMBER > 0
+  static unsigned char soft_pwm_air_0;
+  #endif
+  #if TEMP_AIR_NUMBER > 1
+  static unsigned char soft_pwm_air_1;
+  #endif
+  
+  
   
   if(pwm_count == 0){
     soft_pwm_0 = soft_pwm[0];
@@ -942,6 +968,15 @@ ISR(TIMER0_COMPB_vect)
     soft_pwm_fan =(unsigned char) fanSpeed;
     if(soft_pwm_fan > 0) WRITE(FAN_PIN,1);
     #endif
+    
+    #if HEATER_AIR_NUMBER > 0
+    soft_pwm_air_0 = getHeaterAirPower(0);
+    if(soft_pwm_air_0 > 0) WRITE(HEATER_AIR_0_PIN,1);
+    #endif
+    #if HEATER_AIR_NUMBER > 1
+    soft_pwm_air_1 = getHeaterAirPower(1);
+    if(soft_pwm_air_1 > 0) WRITE(HEATER_AIR_1_PIN,1);
+    #endif
   }
   if(soft_pwm_0 <= pwm_count) WRITE(HEATER_0_PIN,0);
   #if EXTRUDERS > 1
@@ -955,6 +990,13 @@ ISR(TIMER0_COMPB_vect)
   #endif
   #ifdef FAN_SOFT_PWM
   if(soft_pwm_fan <= pwm_count) WRITE(FAN_PIN,0);
+  #endif
+  
+  #if HEATER_AIR_NUMBER > 0
+  if(soft_pwm_air_0 <= pwm_count) WRITE(HEATER_AIR_0_PIN,0);
+  #endif
+  #if HEATER_AIR_NUMBER > 1
+  if(soft_pwm_air_1 <= pwm_count) WRITE(HEATER_AIR_1_PIN,0);
   #endif
   
   pwm_count++;
@@ -1012,7 +1054,8 @@ ISR(TIMER0_COMPB_vect)
         ADMUX = ((1 << REFS0) | (TEMP_1_PIN & 0x07));
         ADCSRA |= 1<<ADSC; // Start conversion
       #endif
-      lcd_buttons_update();
+      //lcd_buttons_update();
+      
       temp_state = 5;
       break;
     case 5: // Measure TEMP_1
@@ -1038,6 +1081,61 @@ ISR(TIMER0_COMPB_vect)
       #if (TEMP_2_PIN > -1)
         raw_temp_2_value += ADC;
       #endif
+      temp_state = 8;
+      break;
+    //-----------------------------AIR CONTROL-----------------------
+    case 8: // Prepare TEMP_AIR_0
+      #if (TEMP_AIR_0_PIN > -1)
+        #if TEMP_AIR_0_PIN > 7
+          ADCSRB = 1<<MUX5;
+        #else
+          ADCSRB = 0;
+        #endif
+        ADMUX = ((1 << REFS0) | (TEMP_AIR_0_PIN & 0x07));
+        ADCSRA |= 1<<ADSC; // Start conversion
+      #endif
+      temp_state = 9;
+      break;
+    case 9: // Measure TEMP_AIR_0
+      #if (TEMP_AIR_0_PIN > -1)
+        raw_temp_air_0_value += ADC;
+      #endif
+      temp_state = 10;
+      break;
+    case 10: // Prepare TEMP_AIR_1
+      #if (TEMP_AIR_1_PIN > -1)
+        #if TEMP_AIR_1_PIN > 7
+          ADCSRB = 1<<MUX5;
+        #else
+          ADCSRB = 0;
+        #endif
+        ADMUX = ((1 << REFS0) | (TEMP_AIR_1_PIN & 0x07));
+        ADCSRA |= 1<<ADSC; // Start conversion
+      #endif
+      temp_state = 11;
+      break;
+    case 11: // Measure TEMP_AIR_1
+      #if (TEMP_AIR_1_PIN > -1)
+        raw_temp_air_1_value += ADC;
+      #endif
+      temp_state = 12;
+      break;
+    case 12: // Prepare TEMP_AIR_2
+      #if (TEMP_AIR_2_PIN > -1)
+        #if TEMP_AIR_2_PIN > 7
+          ADCSRB = 1<<MUX5;
+        #else
+          ADCSRB = 0;
+        #endif
+        ADMUX = ((1 << REFS0) | (TEMP_AIR_2_PIN & 0x07));
+        ADCSRA |= 1<<ADSC; // Start conversion
+      #endif
+      temp_state = 13;
+      break;
+    case 13: // Measure TEMP_AIR_2
+      #if (TEMP_AIR_2_PIN > -1)
+        raw_temp_air_2_value += ADC;
+      #endif
       temp_state = 0;
       temp_count++;
       break;
@@ -1049,6 +1147,14 @@ ISR(TIMER0_COMPB_vect)
     
   if(temp_count >= 16) // 8 ms * 16 = 128ms.
   {
+	//if ( !temp_air_ready ) {
+		if ( HEATER_AIR_NUMBER > 0 )
+			current_temperature_air_raw[0] = raw_temp_air_0_value;
+		if ( HEATER_AIR_NUMBER > 1 )
+			current_temperature_air_raw[1] = raw_temp_air_1_value;
+		if ( HEATER_AIR_NUMBER > 2 )
+			current_temperature_air_raw[2] = raw_temp_air_2_value;
+	//}
     if (!temp_meas_ready) //Only update the raw values if they have been read. Else we could be updating them during reading.
     {
       current_temperature_raw[0] = raw_temp_0_value;
@@ -1060,13 +1166,16 @@ ISR(TIMER0_COMPB_vect)
 #endif
       current_temperature_bed_raw = raw_temp_bed_value;
     }
-    
     temp_meas_ready = true;
     temp_count = 0;
     raw_temp_0_value = 0;
     raw_temp_1_value = 0;
     raw_temp_2_value = 0;
     raw_temp_bed_value = 0;
+    
+    raw_temp_air_0_value = 0;
+	raw_temp_air_1_value = 0;
+	raw_temp_air_2_value = 0;
 
 #if HEATER_0_RAW_LO_TEMP > HEATER_0_RAW_HI_TEMP
     if(current_temperature_raw[0] <= maxttemp_raw[0]) {

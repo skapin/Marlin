@@ -440,8 +440,6 @@ void loop()
   }
   //check heater every n milliseconds
   manage_heater();
-  //check air temp every m milliseconds
-  manage_air();
   manage_inactivity();
   // control all fan (FAN_CONTROL_EXTENSION)
   control_fan( );
@@ -1058,7 +1056,9 @@ void process_commands()
         SERIAL_ERROR_START;
         SERIAL_ERRORLNPGM(MSG_ERR_NO_THERMISTORS);
       #endif
-
+		// AirControl.c : print temp of air oven
+		printAirStatus();
+	  
         SERIAL_PROTOCOLPGM(" @:");
         SERIAL_PROTOCOL(getHeaterPower(tmp_extruder));  
 
@@ -1110,6 +1110,8 @@ void process_commands()
             SERIAL_PROTOCOL_F(degHotend(tmp_extruder),1); 
             SERIAL_PROTOCOLPGM(" E:");
             SERIAL_PROTOCOL((int)tmp_extruder); 
+            // AirControl.c : print temp of air oven
+			printAirStatus();
             #ifdef TEMP_RESIDENCY_TIME
               SERIAL_PROTOCOLPGM(" W:");
               if(residencyStart > -1)
@@ -1161,6 +1163,8 @@ void process_commands()
             SERIAL_PROTOCOL((int)active_extruder); 
             SERIAL_PROTOCOLPGM(" B:");
             SERIAL_PROTOCOL_F(degBed(),1); 
+            // AirControl.c : print temp of air oven
+            printAirStatus();
             SERIAL_PROTOCOLLN(""); 
             codenum = millis(); 
           }
