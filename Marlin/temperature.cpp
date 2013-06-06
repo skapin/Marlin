@@ -1081,7 +1081,9 @@ ISR(TIMER0_COMPB_vect)
       #if (TEMP_2_PIN > -1)
         raw_temp_2_value += ADC;
       #endif
-      temp_state = 8;
+//      temp_state = 8;
+		temp_count++;
+        temp_state = 0;
       break;
     //-----------------------------AIR CONTROL-----------------------
     case 8: // Prepare TEMP_AIR_0
